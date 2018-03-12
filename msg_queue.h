@@ -9,9 +9,6 @@
 #include <mutex>
 #include <condition_variable>
 
-#ifndef CONCURRENCY_MSG_QUEUE_H
-#define CONCURRENCY_MSG_QUEUE_H
-
 template<class T>
 class msg_queue {
 private:
@@ -40,8 +37,5 @@ public:
     }
 
 };
-
-
-#endif //CONCURRENCY_MSG_QUEUE_H
 
 #endif //CONCURRENCY_MSG_QUEUE_H

@@ -1,14 +1,21 @@
 #include <iostream>
 #include <thread>
-#include <vector>
 #include <mutex>
 #include "timer.h"
+#include "msg_queue.h"
 
 using namespace std;
 
 mutex pantalla;
 
-void tarea(int inicio, int fin);
+typedef struct {
+    int inicio;
+    int fin;
+} par;
+
+msg_queue<par> sms;
+
+void tarea();
 
 //void sleep(int s) {
 //    clock_t begin;
@@ -37,13 +44,13 @@ bool esPrimo(unsigned int num) {
     return true;
 }
 
-#define CANT_HILOS 3
+#define CANT_HILOS 8
+#define INTERVALO 500
 
 int main() {
-
+    thread *h[CANT_HILOS];
     timer temporizador;
-
-    vector<thread> h;
+//    par dato;
     unsigned int inicio = 2;
     unsigned int fin = 300000;
     unsigned int intervalo = (fin - inicio) / CANT_HILOS;
@@ -51,21 +58,30 @@ int main() {
     temporizador.begin();
 
     for (int j = 0; j < CANT_HILOS; j++) {
-        h.emplace_back(tarea, inicio + intervalo * j, inicio + intervalo * (j + 1) - 1);
+        h[j] = new thread(tarea);
     }
+    for (int i = 2; i < CANT_HILOS; i = i + INTERVALO) {
+//        dato.inicio = i;
+//        dato.fin = i + INTERVALO - 1;
+//        sms.enqueue(dato);
+        sms.enqueue({i, i + INTERVALO - 1});
+    }
+
     for (auto &actual : h)
-        actual.join();
+        actual->join();
 
     temporizador.end();
-
     cout << "tiempo ";
     temporizador.show();
 
     return 0;
 }
 
-void tarea(int inicio, int fin) {
-    for (int i = inicio; i < fin; i++)
+void tarea() {
+    par dato;
+    dato = sms.dequeue();
+
+    for (int i = dato.inicio; i < dato.fin; i++)
         if (esPrimo(i)) {
             pantalla.lock();
             std::cout << i << std::endl;
