@@ -6,5 +6,5 @@ set(CMAKE_CXX_STANDARD 11)
 
 
 
-add_executable(Concurrency main.cpp timer.h)
+add_executable(Concurrency main.cpp timer.h msg_queue.h)
 TARGET_LINK_LIBRARIES( Concurrency pthread)
